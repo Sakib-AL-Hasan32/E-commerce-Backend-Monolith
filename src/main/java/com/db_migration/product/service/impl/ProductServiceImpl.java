@@ -38,6 +38,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @PreAuthorize("hasAuthority('" + PermissionNames.CREATE_PRODUCT + "')")
+    @CacheEvict(cacheNames = "productList", allEntries = true)
     public ApiResponse<ProductResponse> create(ProductCreateRequest productCreateRequest) {
 
         if(productRepository.existsBySku(productCreateRequest.sku())) {
