@@ -13,6 +13,9 @@ import com.db_migration.inventory.entity.Inventory;
 import com.db_migration.inventory.repository.InventoryRepository;
 import com.db_migration.inventory.service.InventoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,6 +31,12 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @PreAuthorize("hasAuthority('" + PermissionNames.INCREASE_INVENTORY + "')")
+    @Caching(
+            evict = {
+                    @CacheEvict(cacheNames = "product",  allEntries = true),
+                    @CacheEvict(cacheNames = "productList", allEntries = true)
+            }
+    )
     public ApiResponse<InventoryResponse> increase(InventoryQuantityRequest inventoryQuantityRequest) {
 
         Inventory inventory = inventoryRepository.findByProductId(inventoryQuantityRequest.productId()).orElseThrow(() -> new ResourceNotFound(ApiMessages.Error.INVENTORY_NOT_FOUND));
@@ -44,6 +53,12 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @PreAuthorize("hasAuthority('" + PermissionNames.DECREASE_INVENTORY + "')")
+    @Caching(
+            evict = {
+                    @CacheEvict(cacheNames = "product",  allEntries = true),
+                    @CacheEvict(cacheNames = "productList", allEntries = true)
+            }
+    )
     public ApiResponse<InventoryResponse> decrease(InventoryQuantityRequest inventoryQuantityRequest) {
 
         Inventory inventory = inventoryRepository.findByProductId(inventoryQuantityRequest.productId()).orElseThrow(() -> new ResourceNotFound(ApiMessages.Error.INVENTORY_NOT_FOUND));
@@ -66,6 +81,12 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @PreAuthorize("hasAuthority('" + PermissionNames.RESERVE_INVENTORY + "')")
+    @Caching(
+            evict = {
+                    @CacheEvict(cacheNames = "product",  allEntries = true),
+                    @CacheEvict(cacheNames = "productList", allEntries = true)
+            }
+    )
     public ApiResponse<InventoryResponse> reserve(InventoryQuantityRequest inventoryQuantityRequest) {
 
         Inventory inventory = inventoryRepository.findByProductId(inventoryQuantityRequest.productId()).orElseThrow(() -> new ResourceNotFound(ApiMessages.Error.INVENTORY_NOT_FOUND));
@@ -86,6 +107,12 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @PreAuthorize("hasAuthority('" + PermissionNames.RELEASE_INVENTORY + "')")
+    @Caching(
+            evict = {
+                    @CacheEvict(cacheNames = "product",  allEntries = true),
+                    @CacheEvict(cacheNames = "productList", allEntries = true)
+            }
+    )
     public ApiResponse<InventoryResponse> release(InventoryQuantityRequest inventoryQuantityRequest) {
 
         Inventory inventory = inventoryRepository.findByProductId(inventoryQuantityRequest.productId()).orElseThrow(() -> new ResourceNotFound(ApiMessages.Error.INVENTORY_NOT_FOUND));
@@ -106,6 +133,12 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @PreAuthorize("hasAuthority('" + PermissionNames.VIEW_INVENTORY + "')")
+    @Caching(
+            evict = {
+                    @CacheEvict(cacheNames = "product",  allEntries = true),
+                    @CacheEvict(cacheNames = "productList", allEntries = true)
+            }
+    )
     public ApiResponse<PageResponse<InventoryResponse>> getAll(Pageable pageable) {
         Page<Inventory> page = inventoryRepository.findAll(pageable);
         List<InventoryResponse> responses = new ArrayList<>();
@@ -134,6 +167,12 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @PreAuthorize("hasAuthority('" + PermissionNames.ADJUST_INVENTORY + "')")
+    @Caching(
+            evict = {
+                    @CacheEvict(cacheNames = "product",  allEntries = true),
+                    @CacheEvict(cacheNames = "productList", allEntries = true)
+            }
+    )
     public ApiResponse<InventoryResponse> adjust(InventoryAdjustRequest inventoryAdjustRequest) {
 
         Inventory inventory = inventoryRepository.findByProductId(inventoryAdjustRequest.productId()).orElseThrow(() -> new ResourceNotFound(ApiMessages.Error.INVENTORY_NOT_FOUND));
