@@ -20,6 +20,8 @@ import com.db_migration.inventory.repository.InventoryRepository;
 import com.db_migration.product.entity.Product;
 import com.db_migration.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -40,6 +42,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @PreAuthorize("hasAuthority('" + PermissionNames.ADD_ITEM_TO_CART + "')")
+    @CacheEvict(cacheNames = "cart", allEntries = true)
     public ApiResponse<CartResponse> addItem(CartItemCreateRequest request, UserDetails userDetails) {
 
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new ResourceNotFound(ApiMessages.Error.USER_NOT_FOUND));
@@ -93,6 +96,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @PreAuthorize("hasAuthority('" + PermissionNames.REMOVE_ITEM_FROM_CART + "')")
+    @CacheEvict(cacheNames = "cart", allEntries = true)
     public ApiResponse<CartResponse> removeItem(UserDetails userDetails, Long id) {
 
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new ResourceNotFound(ApiMessages.Error.USER_NOT_FOUND));
@@ -113,6 +117,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @PreAuthorize("hasAuthority('" + PermissionNames.VIEW_CART + "')")
+    @Cacheable(cacheNames = "cart", key = "#userDetails.username")
     public ApiResponse<CartResponse> getAll(UserDetails userDetails) {
 
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new ResourceNotFound(ApiMessages.Error.USER_NOT_FOUND));
@@ -129,6 +134,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @PreAuthorize("hasAuthority('" + PermissionNames.UPDATE_CART + "')")
+    @CacheEvict(cacheNames = "cart", allEntries = true)
     public ApiResponse<CartResponse> increaseQuantity(UserDetails userDetails, Long id, CartItemUpdateRequest request) {
 
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new ResourceNotFound(ApiMessages.Error.USER_NOT_FOUND));
@@ -149,6 +155,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @PreAuthorize("hasAuthority('" + PermissionNames.UPDATE_CART + "')")
+    @CacheEvict(cacheNames = "cart", allEntries = true)
     public ApiResponse<CartResponse> decreaseQuantity(UserDetails userDetails, Long id, CartItemUpdateRequest request) {
 
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new ResourceNotFound(ApiMessages.Error.USER_NOT_FOUND));
@@ -169,6 +176,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @PreAuthorize("hasAuthority('" + PermissionNames.DELETE_CART + "')")
+    @CacheEvict(cacheNames = "cart", allEntries = true)
     public ApiResponse<Void> clearCart(UserDetails userDetails) {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new ResourceNotFound(ApiMessages.Error.USER_NOT_FOUND));
 
