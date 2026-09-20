@@ -25,6 +25,8 @@ import com.db_migration.product.entity.Product;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -49,6 +51,12 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     @PreAuthorize("hasAuthority('" + PermissionNames.PLACE_ORDER + "')")
+    @Caching(
+            evict = {
+                    @CacheEvict(cacheNames = "product",  allEntries = true),
+                    @CacheEvict(cacheNames = "productList", allEntries = true)
+            }
+    )
     public ApiResponse<OrderResponse> placeOrder(UserDetails userDetails, OrderCreateRequest request) {
 
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException(ApiMessages.Error.USER_NOT_FOUND));
@@ -129,6 +137,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @PreAuthorize("hasAuthority('" + PermissionNames.CANCEL_ORDER + "')")
+    @Caching(
+            evict = {
+                    @CacheEvict(cacheNames = "product",  allEntries = true),
+                    @CacheEvict(cacheNames = "productList", allEntries = true)
+            }
+    )
     public ApiResponse<Void> cancelOrder(UserDetails userDetails, Long orderId) {
         User user = userRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException(ApiMessages.Error.USER_NOT_FOUND));
@@ -162,6 +176,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @PreAuthorize("hasAuthority('" + PermissionNames.VIEW_ORDER + "')")
+    @Caching(
+            evict = {
+                    @CacheEvict(cacheNames = "product",  allEntries = true),
+                    @CacheEvict(cacheNames = "productList", allEntries = true)
+            }
+    )
     public ApiResponse<List<OrderResponse>> getAll(UserDetails userDetails) {
 
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException(ApiMessages.Error.USER_NOT_FOUND));
